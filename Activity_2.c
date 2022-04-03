@@ -21,25 +21,78 @@ queue *linkedListHead;
 
 //Returns the item at the end of the list and removes it from the list
 proc *pop () {   
-    proc *returnProcess = malloc(sizeof(proc));
-    queue *nextNode = NULL;
+  proc *returnProcess = malloc(sizeof(proc));
+  queue *nextNode = NULL;
 
-    if(linkedListHead == NULL){
-        return NULL;
+  if(linkedListHead == NULL){
+      return NULL;
+  }
+
+  nextNode = linkedListHead->next;
+  *returnProcess = linkedListHead->process;
+  linkedListHead = nextNode;
+
+  return returnProcess;
+}
+
+proc *delete_name(char *name) {
+  int found = 0;
+  proc *DeletedProcess = malloc(sizeof(proc));
+  queue *current = linkedListHead;
+
+  //Check if the list is empty, and if empty then name not found
+  if (current->next == NULL) {
+    found = 0;
+  }
+
+  //Keep traversing through the linked list until its empty
+  while (current->next != NULL){
+    char *currentName = current->next->process.name;
+    //If the strings match then it returns 0
+    if (strcmp (currentName, name) == 0) {
+      *DeletedProcess = current->next->process;
+      current->next = current->next->next;
+      found = 1;
     }
+    current = current->next;
+  }
 
-    nextNode = linkedListHead->next;
-    *returnProcess = linkedListHead->process;
-    linkedListHead = nextNode;
+  //If the name is not found, then change deleted process to NULL
+  if (found == 0) {
+    DeletedProcess = NULL;
+  }
 
-    return returnProcess;
+  return DeletedProcess;
 }
 
-void delete_name(char *name) {
+proc* delete_pid(int pid) {
+  int found = 0;
+  proc *DeletedProcess = malloc(sizeof(proc));
+  queue *current = linkedListHead;
 
-}
+  //Check if the list is empty, and if empty then name not found
+  if (current->next == NULL) {
+    found = 0;
+  }
 
-void delete_pid(int pid) {
+  //Keep traversing through the linked list until its empty
+  while (current->next != NULL){
+    int currentPID = current->next->process.pid;
+    //If the strings match then it returns 0
+    if (currentPID == pid) {
+      *DeletedProcess = current->next->process;
+      current->next = current->next->next;
+      found = 1;
+    }
+    current = current->next;
+  }
+
+  //If the name is not found, then change deleted process to NULL
+  if (found == 0) {
+    DeletedProcess = NULL;
+  }
+
+  return DeletedProcess;
 
 }
 
@@ -113,14 +166,45 @@ void readFile(){
   }  
 }
 
+void printDeleted (proc *deletedProc) {
+  if (deletedProc != NULL){  
+    printf("Deleted Process: %s with PID: %d\n", deletedProc->name, deletedProc->pid);
+  }
+  else {
+    printf("Process NOT FOUND! \n");
+  }
+}
+
+void printProcess (proc *process){  
+  printf("Process Name: %s \n", process->name);
+  printf("Process Priority: %d \n", process->priority);
+  printf("Process ID: %d \n", process->pid);
+  printf("Process Runtime: %d \n\n", process->runTime);
+}
+
 int main (void){
-    linkedListHead = NULL;
-    linkedListHead = malloc(sizeof(queue));
 
-    readFile();
-    printList();
+  linkedListHead = NULL;
+  linkedListHead = malloc(sizeof(queue));
+  proc *deletedProc;
+  int counter = 1;
+  char deleteName[6] = "emacs";
+  int deletePID = 12235;
+  
+  readFile();
+  // deletedProc = delete_name(deleteName);
+  // printDeleted(deletedProc);
 
-    proc *poppedProcess = pop();
+  // deletedProc = delete_pid(deletePID);
+  // printDeleted(deletedProc);
 
-    printf("Popped Name: %s", poppedProcess->name);
+  while (linkedListHead != NULL) {
+    printf("Process Popped %d \n", counter);
+    deletedProc = pop();
+    printProcess(deletedProc);
+    counter++;
+  }
+
+  //printList();
+
 }
