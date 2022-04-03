@@ -31,6 +31,8 @@ void push (proc *process){
   //Add the new process
   current->next = malloc(sizeof(queue));
   current->process = *process;
+
+  //After adding the new item, set the next item to NULL or end of the list
   current->next->next = NULL;
 }
 
@@ -52,6 +54,7 @@ void printList () {
 void readFile(){
    FILE *fp;
    char buffer[256]; 
+
   // Open file
   fp = fopen("processes.txt", "r");
   if (fp == NULL) {
@@ -65,22 +68,25 @@ void readFile(){
     char *token;
 
     //systemd, 0, 1, 5 
-    //Get the process name
+    //Get Process Name
     token = strtok(buffer, ", ");
-    strcpy (newProcess->name, token);
-    token = strtok(NULL, ", ");
-    
-    //If the token is NULL, then no more data left
-    if (token == NULL){
+    if (token != NULL){
+      strcpy (newProcess->name, token);
+    }
+    else {
       break;
     }
-
+    
+    //sscanf(const char *str, const char *format, ...) used to get 
     //Get the priority value
+    token = strtok(NULL, ", ");
     sscanf(token, "%d", &newProcess->priority);
-    token = strtok (NULL, ", ");
 
     //Get the PID value
+    token = strtok (NULL, ", ");
     sscanf(token, "%d", &newProcess->pid);
+
+    //Get the runtime Value
     token = strtok(NULL, ", ");
     sscanf (token, "%d", &newProcess->runTime);
     
@@ -92,7 +98,8 @@ void readFile(){
 int main (void){
   linkedListHead = NULL;
   linkedListHead = malloc(sizeof(queue));
-
+  
+  printf("\n");
   readFile();
   printList();
 }

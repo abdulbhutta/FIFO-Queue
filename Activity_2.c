@@ -35,6 +35,7 @@ proc *pop () {
   return returnProcess;
 }
 
+//Delete a process with the process name
 proc *delete_name(char *name) {
   int found = 0;
   proc *DeletedProcess = malloc(sizeof(proc));
@@ -65,6 +66,7 @@ proc *delete_name(char *name) {
   return DeletedProcess;
 }
 
+//Delete a process with process ID
 proc* delete_pid(int pid) {
   int found = 0;
   proc *DeletedProcess = malloc(sizeof(proc));
@@ -93,7 +95,6 @@ proc* delete_pid(int pid) {
   }
 
   return DeletedProcess;
-
 }
 
 //Push a process into the end of the list
@@ -114,12 +115,14 @@ void push (proc *process){
 //Print the list out
 void printList () {
   queue *current = linkedListHead;
+
   while (current->next != NULL){
     //Print the value
     printf("Process Name: %s \n", current->process.name);
     printf("Process priority: %d \n", current->process.priority);
     printf("Process ID: %d \n", current->process.pid);
     printf("Process Runtime: %d \n\n", current->process.runTime);
+
     //Go to the next item in the list
     current = current->next;
   }
@@ -129,6 +132,7 @@ void printList () {
 void readFile(){
    FILE *fp;
    char buffer[256]; 
+
   // Open file
   fp = fopen("processes.txt", "r");
   if (fp == NULL) {
@@ -142,22 +146,25 @@ void readFile(){
     char *token;
 
     //systemd, 0, 1, 5 
-    //Get the process name
+    //Get Process Name
     token = strtok(buffer, ", ");
-    strcpy (newProcess->name, token);
-    token = strtok(NULL, ", ");
-    
-    //If the token is NULL, then no more data left
-    if (token == NULL){
+    if (token != NULL){
+      strcpy (newProcess->name, token);
+    }
+    else {
       break;
     }
-
+    
+    //sscanf(const char *str, const char *format, ...) used to get 
     //Get the priority value
+    token = strtok(NULL, ", ");
     sscanf(token, "%d", &newProcess->priority);
-    token = strtok (NULL, ", ");
 
     //Get the PID value
+    token = strtok (NULL, ", ");
     sscanf(token, "%d", &newProcess->pid);
+
+    //Get the runtime Value
     token = strtok(NULL, ", ");
     sscanf (token, "%d", &newProcess->runTime);
     
@@ -166,6 +173,7 @@ void readFile(){
   }  
 }
 
+//Print out the deleted process from the list
 void printDeleted (proc *deletedProc) {
   if (deletedProc != NULL){  
     printf("Deleted Process: %s with PID: %d\n", deletedProc->name, deletedProc->pid);
@@ -175,6 +183,7 @@ void printDeleted (proc *deletedProc) {
   }
 }
 
+//Print the process values
 void printProcess (proc *process){  
   printf("Process Name: %s \n", process->name);
   printf("Process Priority: %d \n", process->priority);
@@ -183,28 +192,31 @@ void printProcess (proc *process){
 }
 
 int main (void){
-
+  //Start the linkedListHead from NULL (Empty List)
   linkedListHead = NULL;
   linkedListHead = malloc(sizeof(queue));
+
+  //Initialization 
   proc *deletedProc;
   int counter = 1;
   char deleteName[6] = "emacs";
   int deletePID = 12235;
   
+  printf("\n");
   readFile();
-  // deletedProc = delete_name(deleteName);
-  // printDeleted(deletedProc);
+  
+  //Delete process emacs and PID = 12235
+  deletedProc = delete_name(deleteName);
+  printDeleted(deletedProc);
+  deletedProc = delete_pid(deletePID);
+  printDeleted(deletedProc);
+  printf("\n");
 
-  // deletedProc = delete_pid(deletePID);
-  // printDeleted(deletedProc);
-
-  while (linkedListHead != NULL) {
+  //Keep going through the list until its null (end of the list)
+  while (linkedListHead->next != NULL) {
     printf("Process Popped %d \n", counter);
     deletedProc = pop();
     printProcess(deletedProc);
     counter++;
   }
-
-  //printList();
-
 }
